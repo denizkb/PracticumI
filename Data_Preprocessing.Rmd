@@ -1,0 +1,122 @@
+---
+title: "project_BK"
+author: "Deniz KB"
+date: "2022-10-21"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+**Reading Data from dta file**
+
+```{r}
+#"https://gss.norc.org/get-the-data/stata"
+library(haven)
+data_dta_all <- read_dta("./gss7221_r2.dta")
+```
+
+
+
+**Sample of Data**
+
+I will need to work with small datasets. I will get last 2 years data and data from 2000; some numeric and categorical variables.
+
+```{r}
+library(tidyverse)
+sample_dta <- subset(data_dta_all, 
+                     year %in% c(2018,2021, 2000), 
+                     select = c("year", #categorical 1
+                                "id", #num 2
+                                "wrkstat", #categorical 3
+                                "commute", #NAs 4
+                                "marital", #categorical 5
+                                "martype", #categorical 6
+                                "degree", #categorical 7
+                                "income", #categorical 8
+                                "life", #categorical 9
+                                "fair", #categorical 10
+                                "trust", #categorical 11
+                                "prestige", # NAs 12
+                                "news", #categorical 13
+                                "fear", #categorical 14
+                                "age", #numeric 15
+                                "agewed", # NAs 16
+                                "educ", #numeric 17
+                                "paeduc", #num 18
+                                "maeduc", #num 19
+                                "hompop", #num 20
+                                "childs", #num 21
+                                "sibs", #num 22
+                                "babies", #num 23
+                                "preteen", #num 24
+                                "teens", #num 25
+                                "adults" #num 26
+                                )
+                     )
+
+#View(sample_dta)
+```
+
+
+**Write/Read Subset of Data as dta file**
+
+```{r}
+#write_dta(sample_dta,"finaldata.dta")
+
+df_dta <- read_dta("finaldata.dta")
+```
+
+
+**Original Filtered Data**
+
+**Converting Data Types**
+
+```{r}
+library(labelled)
+copy_df_dta <- df_dta 
+```
+
+
+**DataSet for Summaries**
+
+```{r}
+# I might need to come back for "year" variable. #col =1
+
+#For categorical variables
+catCols <- c(3, 5, 6, 7, 8, 9, 10, 11, 13, 14)
+
+for( i in catCols) {
+  copy_df_dta[,i ] <- unlist(to_factor(copy_df_dta[,i ], levels = "l"))
+}
+
+#For numeric Variables
+numCols <- c(1, 2, 4, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26)
+
+for( i in numCols) {
+  copy_df_dta[,i ] <- as.numeric(unlist(to_factor(copy_df_dta[,i ], levels = "v")))
+}
+
+#View(copy_df_dta)
+
+#All NAs for the selected years but they are numeric.
+NAs <- c(4, 12, 16)
+```
+
+
+**DataSet for DT**
+
+```{r}
+#Convert all variables into factors to have goodlooking table instead of slides to filter, drop-down to filter
+
+#Does not work here! I will convert all in server.
+copy_df_dta2 <- df_dta
+for( i in 1:ncol(copy_df_dta2)) {
+  copy_df_dta2[,i ] <- unlist(to_factor(copy_df_dta2[,i ], levels = "l"))
+}
+```
+
+
+**Converting Data from dta file to CSV**
+```{r}
+#write.csv(copy_df_dta,"./finaldata.csv", row.names = FALSE)
+```
